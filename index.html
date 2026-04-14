@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TM Insights</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0c0e13;
+    --bg2: #111318;
+    --gold: #c8a96e;
+    --gold-light: #e2c98a;
+    --text: #e8e4dc;
+    --text-muted: #8a8880;
+    --border: rgba(200,169,110,0.2);
+    --card: rgba(255,255,255,0.03);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(200,169,110,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(200,169,110,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 1.5rem 6%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    backdrop-filter: blur(12px);
+    background: rgba(12,14,19,0.85);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--text);
+  }
+
+  .logo span { color: var(--gold); }
+
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition: color 0.3s;
+  }
+
+  .nav-links a:hover { color: var(--gold); }
+
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 8rem 6% 5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-inner { max-width: 800px; }
+
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--gold);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+
+  .hero-tag::before {
+    content: '';
+    display: block;
+    width: 30px;
+    height: 1px;
+    background: var(--gold);
+  }
+
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    font-weight: 300;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.4s forwards;
+  }
+
+  h1 em { font-style: italic; color: var(--gold); }
+
+  .hero-sub {
+    font-size: 1rem;
+    color: var(--text-muted);
+    line-height: 1.8;
+    max-width: 520px;
+    margin-bottom: 3rem;
+    font-weight: 300;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.6s forwards;
+  }
+
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    color: var(--gold);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border: 1px solid var(--border);
+    padding: 1rem 2rem;
+    transition: all 0.3s;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.8s forwards;
+  }
+
+  .hero-cta:hover { background: rgba(200,169,110,0.08); border-color: var(--gold); gap: 1.2rem; }
+  .hero-cta::after { content: '→'; }
+
+  .hero-line {
+    position: absolute;
+    right: 6%;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    opacity: 0;
+    animation: fadeIn 1s 1.2s forwards;
+  }
+
+  .hero-line span {
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    writing-mode: vertical-rl;
+  }
+
+  .hero-line::before, .hero-line::after {
+    content: '';
+    display: block;
+    width: 1px;
+    height: 80px;
+    background: linear-gradient(to bottom, transparent, var(--gold));
+  }
+
+  .hero-line::after { background: linear-gradient(to bottom, var(--gold), transparent); }
+
+  section {
+    padding: 6rem 6%;
+    position: relative;
+    z-index: 1;
+  }
+
+  .section-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--gold);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+  }
+
+  .section-tag::before {
+    content: '';
+    display: block;
+    width: 20px;
+    height: 1px;
+    background: var(--gold);
+  }
+
+  h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 300;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+  }
+
+  .section-intro {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.8;
+    max-width: 500px;
+    margin-bottom: 4rem;
+  }
+
+  #services { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .service-card {
+    background: var(--bg2);
+    padding: 2.5rem;
+    transition: background 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .service-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s;
+  }
+
+  .service-card:hover::before { transform: translateX(100%); }
+  .service-card:hover { background: rgba(200,169,110,0.04); }
+
+  .service-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 3rem;
+    font-weight: 300;
+    color: rgba(200,169,110,0.15);
+    line-height: 1;
+    margin-bottom: 1.5rem;
+  }
+
+  .service-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    color: var(--text);
+  }
+
+  .service-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.8; }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: center;
+  }
+
+  .about-text p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.9; margin-bottom: 1.2rem; }
+
+  .differentiators { display: flex; flex-direction: column; gap: 0; }
+
+  .diff-item {
+    padding: 1.8rem 0 1.8rem 1.5rem;
+    border-left: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    transition: border-color 0.3s;
+  }
+
+  .diff-item:last-child { border-bottom: none; }
+  .diff-item:hover { border-left-color: var(--gold); }
+
+  .diff-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+
+  .diff-desc { font-size: 0.82rem; color: var(--text-muted); line-height: 1.7; }
+
+  #contact { background: var(--bg2); border-top: 1px solid var(--border); }
+
+  .contact-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: start;
+  }
+
+  .contact-detail { display: flex; flex-direction: column; gap: 2rem; }
+
+  .contact-item { border-left: 1px solid var(--border); padding-left: 1.5rem; }
+
+  .contact-item-label { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.4rem; }
+
+  .contact-item-value { color: var(--text); font-size: 0.95rem; text-decoration: none; transition: color 0.3s; }
+
+  a.contact-item-value:hover { color: var(--gold); }
+
+  .contact-form { display: flex; flex-direction: column; gap: 1.2rem; }
+
+  .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+
+  .form-group label { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); }
+
+  .form-group input,
+  .form-group textarea {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.9rem 1rem;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 300;
+    outline: none;
+    transition: border-color 0.3s;
+    resize: none;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus { border-color: var(--gold); }
+
+  .form-group textarea { height: 120px; }
+
+  .btn-submit {
+    align-self: flex-start;
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 0.9rem 2rem;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .btn-submit:hover { background: rgba(200,169,110,0.1); }
+
+  footer {
+    padding: 2rem 6%;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-weight: 600; letter-spacing: 0.1em; }
+  .footer-logo span { color: var(--gold); }
+  footer p { font-size: 0.75rem; color: var(--text-muted); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @media (max-width: 768px) {
+    .about-grid, .contact-inner { grid-template-columns: 1fr; gap: 3rem; }
+    .hero-line { display: none; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">TM<span>.</span>Insights</div>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">Data Centre Intelligence</div>
+    <h1>Insight<br>driven <em>decisions</em><br>for infrastructure.</h1>
+    <p class="hero-sub">Independent consultancy delivering data science, construction expertise, commercial strategy, and financial modelling for the global data centre and GPU infrastructure sector.</p>
+    <a href="#contact" class="hero-cta">Discuss a project</a>
+  </div>
+  <div class="hero-line">
+    <span>TM Insights Ltd</span>
+  </div>
+</section>
+
+<section id="services">
+  <div class="section-tag">What We Do</div>
+  <h2>Areas of Expertise</h2>
+  <p class="section-intro">Specialist consultancy across four disciplines, tailored to the demands of modern data infrastructure worldwide.</p>
+  <div class="services-grid">
+    <div class="service-card">
+      <div class="service-num">01</div>
+      <div class="service-title">Data Science & Analytics</div>
+      <p class="service-desc">Health check software and diagnostic analytics for data centre equipment including GPUs and networking infrastructure. Turning operational data into actionable intelligence.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-num">02</div>
+      <div class="service-title">Commercial & Sales Strategy</div>
+      <p class="service-desc">Deal origination, commercial negotiation, and procurement strategy for data centre equipment. Supporting clients from initial specification through to contract close.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-num">03</div>
+      <div class="service-title">Financial Modelling</div>
+      <p class="service-desc">Cashflow modelling, investment analysis, and financial planning for data centre projects and infrastructure funding. Rigorous models built for decision-makers.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-num">04</div>
+      <div class="service-title">Construction & Infrastructure Consultancy</div>
+      <p class="service-desc">End-to-end advisory for data centre construction projects, combining hands-on construction consultancy experience with deep technical knowledge of data centre systems, power, cooling, and physical infrastructure.</p>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="about-grid">
+    <div class="about-text">
+      <div class="section-tag">About</div>
+      <h2>Independent.<br>Specialist.<br><em>Trusted.</em></h2>
+      <p>TM Insights is an independent consultancy focused exclusively on the data centre and GPU infrastructure sector — one of the fastest-moving markets in the global economy.</p>
+      <p>We combine technical data science expertise, construction consultancy experience, deep commercial knowledge, and financial rigour to support clients across the full project lifecycle — from equipment health checks to funding strategy and physical infrastructure delivery.</p>
+      <p>Based in the UK and operating internationally, we offer the focus and responsiveness that larger organisations cannot match.</p>
+    </div>
+    <div class="differentiators">
+      <div class="diff-item">
+        <div class="diff-title">Rare breadth of expertise</div>
+        <p class="diff-desc">Few consultants combine data science, construction, commercial, and financial disciplines in a single engagement. We do.</p>
+      </div>
+      <div class="diff-item">
+        <div class="diff-title">Technical depth, not just strategy</div>
+        <p class="diff-desc">We understand the technology inside data centres — from GPU architecture to power and cooling infrastructure — not just the business case around it.</p>
+      </div>
+      <div class="diff-item">
+        <div class="diff-title">Global projects, UK rigour</div>
+        <p class="diff-desc">Operating internationally from a UK base, bringing structured thinking and commercial discipline to fast-moving global markets.</p>
+      </div>
+    </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="section-tag">Get in Touch</div>
+  <h2>Start a Conversation</h2>
+  <div class="contact-inner">
+    <div class="contact-detail">
+      <p style="color:var(--text-muted); font-size:0.95rem; line-height:1.8; margin-bottom:1rem;">Available for project-based engagements and ongoing advisory work. Based in the UK, working with clients internationally.</p>
+      <div class="contact-item">
+        <div class="contact-item-label">Email</div>
+        <a href="/cdn-cgi/l/email-protection#a3cbc6cfcfcce3d7cecacdd0cac4cbd7d08dc0cc8dd6c8" class="contact-item-value"><span class="__cf_email__" data-cfemail="5e363b3232311e2a3337302d3739362a2d703d31702b35">[email&#160;protected]</span></a>
+      </div>
+      <div class="contact-item">
+        <div class="contact-item-label">Location</div>
+        <span class="contact-item-value">United Kingdom</span>
+      </div>
+      <div class="contact-item">
+        <div class="contact-item-label">Availability</div>
+        <span class="contact-item-value">Currently accepting new engagements</span>
+      </div>
+    </div>
+    <form class="contact-form" onsubmit="return false;">
+      <div class="form-group">
+        <label>Your Name</label>
+        <input type="text" placeholder="Jane Smith">
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" placeholder="jane@company.com">
+      </div>
+      <div class="form-group">
+        <label>Message</label>
+        <textarea placeholder="Tell me about your project..."></textarea>
+      </div>
+      <button type="submit" class="btn-submit">Send Message</button>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div cl
